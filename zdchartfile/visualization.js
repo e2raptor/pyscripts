@@ -7,10 +7,10 @@ class Visualization{
     constructor(host, user, passwd, visual, file){
         this.base_path = "/Users/eduardo/Documents/Pincha/AKTIUN/Repos/gs-filter-control/" 
         this.host = host || "https://prototype.zoomdata.com/zoomdata"
-        this.user = user //|| "gsdev"
-        this.pswd = passwd //|| "Z00mda1a"
-        this.name = visual //|| "Filter Control"
-        this.file = file //|| "visualization.js"
+        this.user = user
+        this.pswd = passwd
+        this.name = visual
+        this.file = file
         this.auth = { username: this.user, password: this.pswd }
         this.headers = { "Content-Type": "application/json" }
         this.definition = {}

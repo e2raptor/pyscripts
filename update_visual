@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+import json
+import sys
+import os.path as ospath
+import requests
+from urllib.parse import quote
+
+class Visualization(object):
+
+    def __init__(self, host, user, password, vname, fname):
+        self.base_path ="/Users/eduardo/Documents/Pincha/AKTIUN/Repos/gs-filter-control/" 
+        self.host = host
+        self.user = user
+        self.pswd = password
+        self.name = vname
+        self.file = fname
+        self.definition = {}
+
+    def processVisual(self):
+        print("Updating {}".format(self.name))
+        vdef = self.getVisualization()
+        if vdef and vdef[0]: # If the visual exists
+            self.definition = vdef[0]
+            with open(self.base_path+self.file) as f:
+                content = f.readlines()
+                content = ''.join(content)
+            for comp in self.definition['components']:
+                if comp['name'].lower().strip() in self.file:
+                    comp['body'] = content
+            self.updateVisualization()
+
+    def getVisualization(self):
+        '''Request the visualization current definition from the server'''
+        service = self.host + '/service/visualizations?name={}'.format(quote(self.name))
+        r = requests.get(service, auth=(self.user, self.pswd))
+        if r.status_code == 200:
+            return r.json()
+        return False
+
+    def updateVisualization(self):
+        '''Updates an existing visual for the current account using the zip content'''
+        vid = self.definition['id']
+        service = self.host + '/service/visualizations/{}'.format(vid)
+        headers = { 'Content-Type':'application/json' }
+        body=json.dumps(self.definition)
+        r = requests.put(service, data=body, headers=headers, auth=(self.user, self.pswd))
+        if r.status_code == 204:
+            print ("...updated!")
+        else:
+            print("Update failed, code {}, Error {}".format(r.status_code, r.text))
+
+if __name__ == '__main__':
+    host, user, password = False, False, False
+    args = sys.argv
+    if "-n" in args:
+        visname = args[args.index("-n") + 1]
+    if "-f" in args:
+        filepath = args[args.index("-f") + 1]
+    if "-h" in args:
+        host = args[args.index("-h") + 1]
+    if "-u" in args:
+        user = args[args.index("-u") + 1]
+    if "-p" in args:
+        password = args[args.index("-p") + 1]
+    print(visname)
+    print(filepath)
+    visual = Visualization(host, user, password, visname, filepath)
+    visual.processVisual()
+
+    # update_visuals.py -n "Filter Dev", -f "filter-control-widget/visualization.js"

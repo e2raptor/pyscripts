@@ -1,0 +1,16 @@
+node_modules
+*.py[co]
+*~
+.cache
+.DS_Store
+build
+dist
+docs
+node_modules
+*.egg-info
+.idea
+.vscode
+MANIFEST
+.coverage
+htmlcov
+
